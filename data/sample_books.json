@@ -1,0 +1,62 @@
+[
+  {
+    "title": "O Saci",
+    "author": "Tradição Popular",
+    "category": "Folclore",
+    "description": "Uma aventura divertida com o Saci, personagem clássico do folclore brasileiro.",
+    "tags": ["folclore", "saci", "aventura"],
+    "pdfUrl": "https://example.com/pdfs/saci.pdf",
+    "coverUrl": "https://example.com/capas/saci.jpg",
+    "pages": 18
+  },
+  {
+    "title": "A Menina e a Estrela",
+    "author": "História Original",
+    "category": "Dormir",
+    "description": "Uma menina faz amizade com uma estrela cadente e aprende a sonhar alto.",
+    "tags": ["amizade", "sonhos", "infantil"],
+    "pdfUrl": "https://example.com/pdfs/estrela.pdf",
+    "coverUrl": "https://example.com/capas/estrela.jpg",
+    "pages": 12
+  },
+  {
+    "title": "O Curupira e a Floresta Encantada",
+    "author": "Tradição Popular",
+    "category": "Folclore",
+    "description": "O Curupira protege os animais da floresta de caçadores descuidados.",
+    "tags": ["curupira", "natureza", "folclore"],
+    "pdfUrl": "https://example.com/pdfs/curupira.pdf",
+    "coverUrl": "https://example.com/capas/curupira.jpg",
+    "pages": 15
+  },
+  {
+    "title": "A Cigarra e a Formiga",
+    "author": "Esopo",
+    "category": "Aventuras",
+    "description": "Clássica fábula sobre a importância do trabalho e da preparação.",
+    "tags": ["fábula", "esopo", "animais"],
+    "pdfUrl": "https://example.com/pdfs/cigarra-formiga.pdf",
+    "coverUrl": "https://example.com/capas/cigarra-formiga.jpg",
+    "pages": 8
+  },
+  {
+    "title": "O Tesouro do Rio Dourado",
+    "author": "História Original",
+    "category": "Aventuras",
+    "description": "Crianças encontram um mapa misterioso e embarcam em uma caça ao tesouro.",
+    "tags": ["aventura", "tesouro", "infantil"],
+    "pdfUrl": "https://example.com/pdfs/tesouro.pdf",
+    "coverUrl": "https://example.com/capas/tesouro.jpg",
+    "pages": 20
+  },
+  {
+    "title": "Boa Noite, Lua Azul",
+    "author": "História Original",
+    "category": "Dormir",
+    "description": "História calma e relaxante para ajudar as crianças a dormir.",
+    "tags": ["dormir", "calma", "lua"],
+    "pdfUrl": "https://example.com/pdfs/lua-azul.pdf",
+    "coverUrl": "https://example.com/capas/lua-azul.jpg",
+    "pages": 10
+  }
+]

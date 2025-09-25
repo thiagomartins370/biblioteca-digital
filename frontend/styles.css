@@ -1,0 +1,111 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: #fafafa;
+  color: #333;
+}
+
+header.topo {
+  background: linear-gradient(90deg, #ff8a65, #ffcc80);
+  color: white;
+  text-align: center;
+  padding: 2rem 1rem;
+  border-bottom: 5px solid #ff7043;
+}
+
+header.topo h1 {
+  margin: 0;
+  font-size: 2.3rem;
+}
+
+header.topo p {
+  margin: .3rem 0 0;
+  font-size: 1.1rem;
+}
+
+main {
+  max-width: 900px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
+
+section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.busca {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+
+.busca input {
+  flex: 1;
+  padding: .7rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.busca button {
+  padding: .7rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  background: #ff8a65;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.busca button:hover {
+  background: #ff7043;
+}
+
+.catalogo ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.catalogo li.card {
+  background: #fff8e1;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.catalogo li.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.catalogo li img {
+  max-width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: .5rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2rem;
+  background: #ffcc80;
+  color: #333;
+  border-top: 3px solid #ff8a65;
+  font-weight: bold;
+  font-size: .95rem;
+}

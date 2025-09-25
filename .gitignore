@@ -1,0 +1,11 @@
+# Dependências
+backend/node_modules/
+frontend/node_modules/
+
+# Build/cache
+*.log
+.DS_Store
+
+# Segredos
+.env
+
