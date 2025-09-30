@@ -1,6 +1,5 @@
-// backend/routes/books.js
 import express from 'express';
-import Book from '../models/book.js';
+import Book from '../models/book.js';   // ✅ correto, combina com o arquivo "book.js"
 import auth from '../middleware/auth.js';
 
 const router = express.Router();
