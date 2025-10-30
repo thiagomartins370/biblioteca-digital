@@ -1,58 +1,24 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Biblioteca Digital Infantil</title>
-  <link rel="stylesheet" href="./styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Infantil</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topo">
-    <h1>📚 Biblioteca Digital Infantil</h1>
-    <p>Ler é uma aventura mágica ✨</p>
-  </header>
 
-  <main>
-    <!-- Seção de busca -->
-    <section class="busca">
-      <input id="busca" type="search" placeholder="🔍 Buscar por título ou autor" />
-      <button id="btn-buscar">Buscar</button>
-    </section>
+    <header>
+        <h1>📚 Biblioteca Infantil</h1>
+        <a class="btn-cadastro" href="upload.html">+ Cadastrar Livro</a>
+    </header>
 
-    <!-- Login -->
-    <section class="login">
-      <h2>🔑 Área do Administrador</h2>
-      <form id="form-login">
-        <input id="userInput" placeholder="Usuário" required />
-        <input id="passInput" type="password" placeholder="Senha" required />
-        <button type="submit">Entrar</button>
-      </form>
-      <p id="login-status"></p>
-    </section>
+    <main>
+        <h2>Livros Disponíveis</h2>
+        <ul id="lista" class="books-row"></ul>
+    </main>
 
-    <!-- Formulário de cadastro -->
-    <section class="cadastro">
-      <h2>➕ Adicionar livro</h2>
-      <form id="form-livro">
-        <input id="tituloInput" placeholder="Título *" required />
-        <input id="autorInput" placeholder="Autor" />
-        <input id="pdfUrlInput" type="url" placeholder="URL do PDF *" required />
-        <input id="coverUrlInput" type="url" placeholder="URL da capa (opcional)" />
-        <button type="submit">Salvar</button>
-      </form>
-    </section>
-
-    <!-- Catálogo -->
-    <section class="catalogo">
-      <h2>📖 Catálogo de Livros</h2>
-      <ul id="lista"></ul>
-    </section>
-  </main>
-
-  <footer>
-    <small>🌟 Projeto acadêmico – Univesp PI2 Alunos 2025 🌟</small>
-  </footer>
-
-  <script src="./app.js" defer></script>
+    <!-- Agora carregando o app.js (código correto) -->
+    <script src="app.js"></script>
 </body>
 </html>

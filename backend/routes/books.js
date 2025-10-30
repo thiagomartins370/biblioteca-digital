@@ -1,75 +1,48 @@
 import express from 'express';
-import Book from '../models/book.js';   // ✅ correto, combina com o arquivo "book.js"
-import auth from '../middleware/auth.js';
+import multer from 'multer';
+import { uploadFileToDrive } from '../googleDrive.js';
+import Book from '../models/book.js';
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
-// =======================
-// Rota pública (qualquer um pode ver)
-// =======================
-router.get('/', async (req, res) => {
+// 👉 Lista livros
+router.get('/', async (_req, res) => {
+  const books = await Book.find().sort({ createdAt: -1 });
+  res.json(books);
+});
+
+// 👉 Upload + criação do livro
+router.post('/upload', upload.fields([
+  { name: 'cover', maxCount: 1 },
+  { name: 'pdf', maxCount: 1 }
+]), async (req, res) => {
   try {
-    const { q } = req.query;
-    let filter = {};
+    const { title, category } = req.body;
+    const coverFile = req.files.cover?.[0];
+    const pdfFile = req.files.pdf?.[0];
 
-    if (q) {
-      const regex = new RegExp(q, 'i'); // busca sem case-sensitive
-      filter = {
-        $or: [{ title: regex }, { author: regex }, { tags: regex }]
-      };
+    if (!coverFile || !pdfFile) {
+      return res.status(400).json({ error: "Envie CAPA e PDF" });
     }
 
-    const books = await Book.find(filter).sort({ createdAt: -1 });
-    res.json(books);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+    // 🚀 Uploads no Google Drive
+    const coverId = await uploadFileToDrive(coverFile, 'cover');
+    const pdfId = await uploadFileToDrive(pdfFile, 'pdf');
+
+    // ✅ Salva no Mongo com nomes corretos
+const newBook = await Book.create({
+  title,
+  category,
+  fileUrl: `https://drive.google.com/uc?export=download&id=${pdfId}`, // <--- aqui trocamos pdfUrl por fileUrl
+  coverUrl: `https://drive.google.com/uc?export=view&id=${coverId}`,
 });
 
-// =======================
-// Rotas protegidas (precisam login admin)
-// =======================
+    res.json({ message: "Livro cadastrado com sucesso!", book: newBook });
 
-// Criar livro
-router.post('/', auth, async (req, res) => {
-  try {
-    const newBook = await Book.create(req.body);
-    res.status(201).json(newBook);
   } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-// Buscar por ID
-router.get('/:id', async (req, res) => {
-  try {
-    const book = await Book.findById(req.params.id);
-    if (!book) return res.status(404).json({ message: 'Book not found' });
-    res.json(book);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Atualizar livro
-router.put('/:id', auth, async (req, res) => {
-  try {
-    const updated = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ message: 'Book not found' });
-    res.json(updated);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-// Deletar livro
-router.delete('/:id', auth, async (req, res) => {
-  try {
-    const deleted = await Book.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: 'Book not found' });
-    res.json({ message: 'Book deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Erro ao cadastrar livro:", err);
+    res.status(500).json({ error: "Erro ao cadastrar o livro" });
   }
 });
 

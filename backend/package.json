@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
     "express": "^4.19.2",
-    "mongoose": "^8.5.1"
+    "googleapis": "^162.0.0",
+    "mongoose": "^8.5.1",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
     "jest": "^29.7.0",

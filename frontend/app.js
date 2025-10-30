@@ -1,5 +1,6 @@
 // Base da API
-const apiBase = '/api/books';
+const apiBase = 'http://localhost:3000/api/books';
+
 
 // Guarda o login do admin (Basic Auth)
 let authHeader = null;
@@ -59,15 +60,20 @@ function renderLista(books) {
     lista.innerHTML = '<li>Nenhum livro encontrado.</li>';
     return;
   }
+
   for (const b of books) {
+    // pega PDF independente do modelo
+    const pdfLink = b.fileUrl || b.pdfUrl || '#';
+
     const li = document.createElement('li');
     li.className = 'card';
     li.innerHTML = `
-      ${b.coverUrl ? `<img src="${b.coverUrl}" alt="Capa do livro ${b.title}">` : ''}
+      ${b.coverUrl ? `<img src="${b.coverUrl}" alt="Capa do livro ${b.title}" />` : ''}
       <h3>${b.title}</h3>
       <p><strong>Autor:</strong> ${b.author || 'Desconhecido'}</p>
+
       <div class="action-row">
-        <a href="${b.pdfUrl}" target="_blank" rel="noopener">Abrir PDF</a>
+        <a href="${pdfLink}" target="_blank" rel="noopener">📖 Abrir PDF</a>
         <button data-id="${b._id}" class="btn-remover" aria-label="Remover ${b.title}">Remover</button>
       </div>
     `;
@@ -114,8 +120,8 @@ form?.addEventListener('submit', async (e) => {
   const body = {
     title: $('#tituloInput').value.trim(),
     author: $('#autorInput').value.trim(),
-    pdfUrl: $('#pdfUrlInput').value.trim(),
-    coverUrl: $('#coverUrlInput').value.trim()
+    fileUrl: $('#pdfUrlInput').value.trim(),   // agora usa fileUrl
+    coverUrl: $('#coverUrlInput').value.trim() // agora usa coverUrl
   };
 
   const res = await fetch(apiBase, {
