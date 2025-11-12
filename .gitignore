@@ -9,3 +9,4 @@ frontend/node_modules/
 # Segredos
 .env
 
+backend/token.json 
