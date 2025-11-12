@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login – Biblioteca Infantil</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      background: linear-gradient(180deg, #d8f3ff, #e4ffe9);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      margin: 0;
+      color: #333;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background: linear-gradient(90deg, #2ea8ff, #4bd4b0);
+      color: #fff;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    main {
+      max-width: 400px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 28px;
+      border-radius: 14px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #b2e2ff;
+      margin: 8px 0;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      border-color: #2ea8ff;
+      outline: none;
+      box-shadow: 0 0 5px rgba(46,168,255,0.3);
+    }
+
+    button {
+      background: linear-gradient(90deg, #2ea8ff, #4bd4b0);
+      color: #fff;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    #login-status {
+      margin-top: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    a {
+      color: #1a85ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header><h1>🔑 Login do Administrador</h1></header>
+
+  <main>
+    <form id="login-form">
+      <input type="text" id="user" placeholder="Usuário" required />
+      <input type="password" id="pass" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+    </form>
+
+    <p id="login-status"></p>
+
+    <p style="margin-top:14px;">
+      <a href="index.html">⬅ Voltar para Biblioteca</a>
+    </p>
+  </main>
+
+  <footer>
+    Desenvolvido por <strong>Thiago Martins</strong> – PI II Univesp 2025
+  </footer>
+
+  <script>
+    // 🌐 Detecta automaticamente se está rodando local ou online
+    const apiBase = location.hostname.includes("localhost")
+      ? "http://localhost:3000"
+      : "https://biblioteca-digital-1-gdjw.onrender.com";
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const user = document.getElementById("user").value.trim();
+      const pass = document.getElementById("pass").value.trim();
+      const status = document.getElementById("login-status");
+
+      status.textContent = "Verificando...";
+      status.style.color = "#555";
+
+      try {
+        const res = await fetch(`${apiBase}/api/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user, pass }),
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+          // Cria e salva o token Basic Auth
+          const encoded = btoa(`${user}:${pass}`);
+          localStorage.setItem("authHeader", `Basic ${encoded}`);
+
+          status.textContent = "✅ Login bem-sucedido! Redirecionando...";
+          status.style.color = "green";
+
+          // Redireciona de volta à página principal
+          setTimeout(() => (window.location.href = "index.html"), 1000);
+        } else {
+          status.textContent = "❌ Usuário ou senha incorretos.";
+          status.style.color = "red";
+        }
+      } catch (err) {
+        console.error("Erro no login:", err);
+        status.textContent = "⚠️ Erro de conexão com o servidor.";
+        status.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>

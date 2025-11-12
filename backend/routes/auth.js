@@ -3,10 +3,9 @@ import express from 'express';
 
 const router = express.Router();
 
-// POST /api/login → valida usuário e senha do .env
+// POST /api/login → valida usuário e senha do .env (para salvar no localStorage do front)
 router.post('/login', (req, res) => {
-  const { user, pass } = req.body;
-
+  const { user, pass } = req.body || {};
   if (!user || !pass) {
     return res.status(400).json({ ok: false, message: 'Usuário e senha são obrigatórios' });
   }

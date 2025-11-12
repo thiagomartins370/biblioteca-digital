@@ -1,62 +1,76 @@
+// ============================================
 // backend/server.js
-import 'dotenv/config';
+// Projeto: Biblioteca Digital Infantil (PI 2 Univesp)
+// Autor: Thiago Martins
+// ============================================
+
+import 'dotenv/config.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 import booksRouter from './routes/books.js';
-import authRouter from './routes/auth.js';
+import loginRouter from './routes/auth.js';
+
+// --- Configura caminhos absolutos
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// =============================
-// Configurações básicas
-// =============================
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
-app.use(express.json({ limit: '5mb' }));
+// --- Configuração de CORS (corrigida)
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['*'];
 
-// =============================
-// Conexão MongoDB Atlas
-// =============================
-const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/biblioteca';
-mongoose.connect(mongoUri)
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Permite chamadas internas (sem origin)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      console.warn(`❌ Origem não permitida pelo CORS: ${origin}`);
+      return callback(new Error('CORS bloqueado: origem não autorizada.'));
+    },
+  })
+);
+
+// --- Middlewares globais
+app.use(express.json());
+
+// --- Conexão MongoDB Atlas
+const mongoUri =
+  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/biblioteca';
+
+mongoose.set('strictQuery', true);
+mongoose
+  .connect(mongoUri)
   .then(() => console.log('✅ MongoDB conectado'))
-  .catch(err => console.error('❌ Erro MongoDB:', err.message));
+  .catch((err) => {
+    console.error('❌ Erro ao conectar no MongoDB:', err.message);
+    process.exit(1);
+  });
 
-// =============================
-// Rotas API
-// =============================
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
-app.use('/api/books', booksRouter);
-app.use('/api', authRouter);
+// --- Rotas da API
+app.use('/api/books', booksRouter); // Rotas de livros (listar, upload, excluir)
+app.use('/api', loginRouter); // Rota de login
 
-// ✅ ROTAS DE UPLOAD (PRECISAM VIR ANTES DO FRONTEND)
+// --- Servir frontend estático
+const frontendDir = path.join(__dirname, '../frontend');
+app.use(express.static(frontendDir));
 
+// --- Página inicial
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(frontendDir, 'index.html'));
+});
 
-// =============================
-// Servir arquivos de uploads locais (se algum dia usar)
-// =============================
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
-
-// =============================
-// Servir frontend (estático)
-// =============================
-app.use('/', express.static(path.join(__dirname, '..', 'frontend')));
-
-// =============================
-// Inicializa o servidor
-// =============================
+// --- Sobe o servidor
 const PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
-}
-
-// =============================
-// Google Drive Auth (somente informativo)
-// =============================
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log(`🌐 Origens permitidas: ${allowedOrigins.join(', ')}`);
+});
 
 export default app;

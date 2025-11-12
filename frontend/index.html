@@ -1,24 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca Infantil</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Biblioteca Infantil</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <header>
+    <h1>📘 Biblioteca Infantil</h1>
+    <div class="menu-topo">
+      <a class="btn-cadastro hidden" href="upload.html">+ Cadastrar Livro</a>
+      <a class="btn-login" id="loginBtn" href="login.html">Entrar</a>
+      <button id="logoutBtn" class="btn-sair hidden">Sair</button>
+    </div>
+  </header>
 
-    <header>
-        <h1>📚 Biblioteca Infantil</h1>
-        <a class="btn-cadastro" href="upload.html">+ Cadastrar Livro</a>
-    </header>
+  <main>
+    <h2>Explore os Livros Disponíveis</h2>
 
-    <main>
-        <h2>Livros Disponíveis</h2>
-        <ul id="lista" class="books-row"></ul>
-    </main>
+    <!-- Barra de busca -->
+    <div class="topbar">
+      <input id="busca" type="text" placeholder="Buscar por título ou categoria..." />
+      <button id="btn-buscar">🔍 Buscar</button>
+    </div>
 
-    <!-- Agora carregando o app.js (código correto) -->
-    <script src="app.js"></script>
+    <!-- Lista de livros -->
+    <ul id="lista" class="books-row"></ul>
+  </main>
+
+  <footer style="text-align:center; padding:15px; font-size:14px; color:#555;">
+   <p>Desenvolvido pelo <strong>Grupo Biblioteca Digital Infantil</strong> – PI II Univesp 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>

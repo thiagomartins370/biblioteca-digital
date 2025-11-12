@@ -1,48 +1,87 @@
-import express from 'express';
-import multer from 'multer';
-import { uploadFileToDrive } from '../googleDrive.js';
-import Book from '../models/book.js';
+// ============================================
+// backend/routes/books.js
+// Projeto: Biblioteca Digital Infantil (PI 2 Univesp)
+// Autor: Thiago Martins
+// ============================================
+
+import express from "express";
+import multer from "multer";
+import { uploadFileToDrive } from "../googleDrive.js";
+import Book from "../models/book.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// 👉 Lista livros
-router.get('/', async (_req, res) => {
-  const books = await Book.find().sort({ createdAt: -1 });
-  res.json(books);
-});
-
-// 👉 Upload + criação do livro
-router.post('/upload', upload.fields([
-  { name: 'cover', maxCount: 1 },
-  { name: 'pdf', maxCount: 1 }
-]), async (req, res) => {
+// 📚 Lista todos os livros
+router.get("/", async (_req, res) => {
   try {
-    const { title, category } = req.body;
-    const coverFile = req.files.cover?.[0];
-    const pdfFile = req.files.pdf?.[0];
-
-    if (!coverFile || !pdfFile) {
-      return res.status(400).json({ error: "Envie CAPA e PDF" });
-    }
-
-    // 🚀 Uploads no Google Drive
-    const coverId = await uploadFileToDrive(coverFile, 'cover');
-    const pdfId = await uploadFileToDrive(pdfFile, 'pdf');
-
-    // ✅ Salva no Mongo com nomes corretos
-const newBook = await Book.create({
-  title,
-  category,
-  fileUrl: `https://drive.google.com/uc?export=download&id=${pdfId}`, // <--- aqui trocamos pdfUrl por fileUrl
-  coverUrl: `https://drive.google.com/uc?export=view&id=${coverId}`,
+    const books = await Book.find().sort({ createdAt: -1 });
+    res.json(books);
+  } catch (error) {
+    console.error("❌ Erro ao listar livros:", error);
+    res.status(500).json({ error: "Erro ao listar livros" });
+  }
 });
 
-    res.json({ message: "Livro cadastrado com sucesso!", book: newBook });
+// ➕ Upload + criação do livro
+router.post(
+  "/upload",
+  upload.fields([
+    { name: "cover", maxCount: 1 },
+    { name: "pdf", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const { title, category } = req.body;
+      const coverFile = req.files?.cover?.[0];
+      const pdfFile = req.files?.pdf?.[0];
 
-  } catch (err) {
-    console.error("Erro ao cadastrar livro:", err);
-    res.status(500).json({ error: "Erro ao cadastrar o livro" });
+      if (!title || !category || !coverFile || !pdfFile) {
+        return res
+          .status(400)
+          .json({ error: "Título, categoria, capa e PDF são obrigatórios." });
+      }
+
+      // ⬆️ Envia CAPA
+      const coverUp = await uploadFileToDrive({
+        buffer: coverFile.buffer,
+        fileName: coverFile.originalname,
+        mimeType: coverFile.mimetype,
+      });
+
+      // ⬆️ Envia PDF
+      const pdfUp = await uploadFileToDrive({
+        buffer: pdfFile.buffer,
+        fileName: pdfFile.originalname,
+        mimeType: pdfFile.mimetype,
+      });
+
+      // 📝 Salva no MongoDB
+      const book = await Book.create({
+        title,
+        category,
+        coverUrl: coverUp.url, // ✅ URL direta da capa (Drive uc?export=view&id=)
+        fileUrl: pdfUp.url,    // ✅ URL direta do PDF (também uc?export=view&id=)
+      });
+
+      console.log("📚 Livro cadastrado:", title);
+      res.json(book);
+    } catch (error) {
+      console.error("❌ Erro ao cadastrar livro:", error);
+      res.status(500).json({ error: "Erro ao cadastrar livro" });
+    }
+  }
+);
+
+// 🗑️ Excluir livro
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Book.findByIdAndDelete(id);
+    res.json({ message: "Livro excluído com sucesso" });
+  } catch (error) {
+    console.error("❌ Erro ao excluir livro:", error);
+    res.status(500).json({ error: "Erro ao excluir livro" });
   }
 });
 

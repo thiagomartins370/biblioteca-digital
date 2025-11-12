@@ -1,62 +1,91 @@
-import fs from 'fs';
-import path from 'path';
-import { google } from 'googleapis';
-import { Readable } from 'stream';
+// ============================================
+// backend/googleDrive.js
+// Projeto: Biblioteca Digital Infantil (PI 2 Univesp)
+// Autor: Thiago Martins
+// ============================================
 
-// ===== Caminhos dos arquivos =====
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+import fs from "fs";
+import path from "path";
+import { google } from "googleapis";
+import { Readable } from "stream";
+import { fileURLToPath } from "url";
 
-// ===== Lê credenciais e token =====
-const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
-// Formatos aceitos:
-// { client_id, client_secret, redirect_uris: [...] }   <-- conforme sugerido acima
-const { client_id, client_secret, redirect_uris = ['http://localhost:3000'] } = credentials;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const token = JSON.parse(fs.readFileSync(TOKEN_PATH, 'utf8'));
+const CREDENTIALS_PATH = path.join(__dirname, "credentials.json");
+const TOKEN_PATH = path.join(__dirname, "token.json");
 
-// ===== Cria OAuth2Client com client + secret e aplica o token do usuário =====
-const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-oAuth2Client.setCredentials(token);
+// Cria o cliente autenticado
+function getOAuth2Client() {
+  const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, "utf8"));
+  const token = JSON.parse(fs.readFileSync(TOKEN_PATH, "utf8"));
+  const { client_id, client_secret, redirect_uris } = credentials.installed;
 
-// ===== Instância do Drive autenticada =====
-const drive = google.drive({ version: 'v3', auth: oAuth2Client });
+  const oAuth2Client = new google.auth.OAuth2(
+    client_id,
+    client_secret,
+    redirect_uris[0]
+  );
 
-// ===== Upload ao Drive usando stream =====
-export async function uploadFileToDrive(file, type) {
+  oAuth2Client.setCredentials(token);
+  return oAuth2Client;
+}
+
+// Verifica ou cria a pasta no Drive
+async function getOrCreateFolder(auth, folderName = "BibliotecaDigital") {
+  const drive = google.drive({ version: "v3", auth });
+  const res = await drive.files.list({
+    q: `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and trashed=false`,
+    fields: "files(id, name)",
+    pageSize: 1,
+  });
+
+  if (res.data.files?.length) return res.data.files[0].id;
+
+  const createRes = await drive.files.create({
+    requestBody: { name: folderName, mimeType: "application/vnd.google-apps.folder" },
+    fields: "id",
+  });
+
+  return createRes.data.id;
+}
+
+// Torna o arquivo público
+async function makeFilePublic(auth, fileId) {
+  const drive = google.drive({ version: "v3", auth });
+  await drive.permissions.create({
+    fileId,
+    requestBody: { role: "reader", type: "anyone" },
+  });
+}
+
+// Upload para o Google Drive
+export async function uploadFileToDrive({ buffer, fileName, mimeType, folderName = "BibliotecaDigital" }) {
   try {
-    const fileMetadata = {
-      name: `${Date.now()}-${file.originalname}`,
-      parents: ['root']
-    };
+    const auth = getOAuth2Client();
+    const drive = google.drive({ version: "v3", auth });
+    const folderId = await getOrCreateFolder(auth, folderName);
 
-    // Converte Buffer do multer em stream legível
-    const stream = Readable.from(file.buffer);
+    // Converte o Buffer em Stream
+    const stream = Readable.from(buffer);
 
-    const media = {
-      mimeType: file.mimetype,
-      body: stream
-    };
-
-    const resp = await drive.files.create({
-      requestBody: fileMetadata,
-      media,
-      fields: 'id'
+    const createRes = await drive.files.create({
+      requestBody: { name: fileName, parents: [folderId] },
+      media: { mimeType, body: stream },
+      fields: "id, name",
     });
 
-    const fileId = resp.data.id;
+    const fileId = createRes.data.id;
 
-    // Torna público (qualquer pessoa com o link)
-    await drive.permissions.create({
-      fileId,
-      requestBody: { role: 'reader', type: 'anyone' }
-    });
+    // Torna o arquivo público
+    await makeFilePublic(auth, fileId);
 
-    console.log(`✅ ${type} enviada ao Drive! ID: ${fileId}`);
-    return fileId;
+    // Retorna apenas o link correto para exibição direta
+    const directUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+    return { fileId, url: directUrl };
 
-  } catch (err) {
-    console.error('❌ Erro ao enviar arquivo ao Drive:', err.message);
-    throw err;
+  } catch (error) {
+    console.error("❌ Erro no upload para o Google Drive:", error);
+    throw error;
   }
 }

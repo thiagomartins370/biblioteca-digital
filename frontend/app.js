@@ -1,160 +1,143 @@
-// Base da API
-const apiBase = 'http://localhost:3000/api/books';
+// ============================================
+// frontend/app.js – Biblioteca Digital Infantil
+// Versão simplificada (sem capa)
+// Desenvolvido pelo Grupo Biblioteca Digital Infantil – PI II Univesp 2025
+// ============================================
 
+// 🌐 Caminho base da API – detecta automaticamente o ambiente (local ou online)
+const apiBase =
+  location.hostname.includes("localhost")
+    ? "http://localhost:3000/api/books"
+    : "https://biblioteca-digital-1-gdjw.onrender.com/api/books";
 
-// Guarda o login do admin (Basic Auth)
-let authHeader = null;
+// 🔐 Carrega o token salvo (login admin)
+let authHeader = localStorage.getItem("authHeader") || null;
 
-// Atalhos de DOM
+// 🧩 Atalhos de DOM
 const $ = (sel) => document.querySelector(sel);
-const lista = $('#lista');
-const busca = $('#busca');
-const btnBuscar = $('#btn-buscar');
+const lista = $("#lista");
+const busca = $("#busca");
+const btnBuscar = $("#btn-buscar");
+const btnSair = $("#logoutBtn");
+const btnCadastrar = $(".btn-cadastro");
+const btnLogin = $("#loginBtn");
 
-// ------------------------------
-// LOGIN DO ADMIN (valida no backend)
-// ------------------------------
-const formLogin = document.querySelector('#form-login');
-formLogin?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const user = document.querySelector('#userInput').value.trim();
-  const pass = document.querySelector('#passInput').value;
-
-  if (!user || !pass) {
-    $('#login-status').textContent = 'Preencha usuário e senha.';
+// --------------------------------------------
+// 📚 Renderização simplificada – título + categoria + botões
+// --------------------------------------------
+function renderizarLivros(books) {
+  if (!books.length) {
+    lista.innerHTML = "<li><p>Nenhum livro encontrado.</p></li>";
     return;
   }
 
+  lista.innerHTML = books
+    .map(
+      (b) => `
+      <li class="livro-card simples">
+        <h3>📘 ${b.title}</h3>
+        <p>${b.category || "Sem categoria"}</p>
+        <div class="buttons">
+          <a href="${b.fileUrl}" target="_blank" class="btn-ler">📖 Ler</a>
+          ${
+            authHeader && authHeader.startsWith("Basic ")
+              ? `<button class="btn-excluir" data-id="${b._id}">🗑️ Excluir</button>`
+              : ""
+          }
+        </div>
+      </li>
+    `
+    )
+    .join("");
+}
+
+// --------------------------------------------
+// 🔎 Função: listar livros (com busca opcional)
+// --------------------------------------------
+async function listar(filtro = "") {
+  lista.innerHTML = "<li><p>Carregando livros...</p></li>";
+
   try {
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user, pass })
+    const res = await fetch(`${apiBase}`);
+    const books = await res.json();
+
+    const filtrados = filtro
+      ? books.filter((b) =>
+          b.title.toLowerCase().includes(filtro.toLowerCase())
+        )
+      : books;
+
+    renderizarLivros(filtrados);
+  } catch (err) {
+    console.error("❌ Erro ao listar livros:", err);
+    lista.innerHTML = "<li><p>Erro ao carregar livros.</p></li>";
+  }
+}
+
+// --------------------------------------------
+// 🗑️ Função: excluir livro (somente admin)
+// --------------------------------------------
+lista?.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".btn-excluir");
+  if (!btn) return;
+
+  const id = btn.dataset.id;
+  if (!confirm("Deseja realmente excluir este livro?")) return;
+
+  try {
+    const res = await fetch(`${apiBase}/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: authHeader },
     });
 
     if (res.ok) {
-      authHeader = 'Basic ' + btoa(`${user}:${pass}`);
-      $('#login-status').textContent = '🔑 Logado como admin!';
+      alert("✅ Livro removido com sucesso!");
+      listar(busca.value);
     } else {
-      $('#login-status').textContent = '❌ Credenciais inválidas';
+      const data = await res.json();
+      alert("Erro: " + (data.error || "Não foi possível remover o livro."));
     }
   } catch (err) {
-    console.error(err);
-    $('#login-status').textContent = '⚠️ Erro ao conectar ao servidor';
+    console.error("❌ Erro ao excluir livro:", err);
+    alert("Erro ao excluir o livro. Verifique o console para mais detalhes.");
   }
 });
 
-// ------------------------------
-// LISTAGEM
-// ------------------------------
-async function listar(q = '') {
-  const url = q ? `${apiBase}?q=${encodeURIComponent(q)}` : apiBase;
-  const res = await fetch(url);
-  const data = await res.json();
-  renderLista(data);
+// --------------------------------------------
+// 🔐 Login/Logout: mostrar/ocultar botões
+// --------------------------------------------
+function atualizarInterface() {
+  if (authHeader) {
+    btnCadastrar?.classList.remove("hidden");
+    btnSair?.classList.remove("hidden");
+    btnLogin?.classList.add("hidden");
+  } else {
+    btnCadastrar?.classList.add("hidden");
+    btnSair?.classList.add("hidden");
+    btnLogin?.classList.remove("hidden");
+  }
 }
 
-function renderLista(books) {
-  lista.innerHTML = '';
-  if (!books.length) {
-    lista.innerHTML = '<li>Nenhum livro encontrado.</li>';
-    return;
-  }
+btnSair?.addEventListener("click", () => {
+  localStorage.removeItem("authHeader");
+  authHeader = null;
+  atualizarInterface();
+  alert("Você saiu da conta de administrador.");
+});
 
-  for (const b of books) {
-    // pega PDF independente do modelo
-    const pdfLink = b.fileUrl || b.pdfUrl || '#';
+// --------------------------------------------
+// 🔍 Busca
+// --------------------------------------------
+btnBuscar?.addEventListener("click", () => listar(busca.value));
+busca?.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") listar(busca.value);
+});
 
-    const li = document.createElement('li');
-    li.className = 'card';
-    li.innerHTML = `
-      ${b.coverUrl ? `<img src="${b.coverUrl}" alt="Capa do livro ${b.title}" />` : ''}
-      <h3>${b.title}</h3>
-      <p><strong>Autor:</strong> ${b.author || 'Desconhecido'}</p>
-
-      <div class="action-row">
-        <a href="${pdfLink}" target="_blank" rel="noopener">📖 Abrir PDF</a>
-        <button data-id="${b._id}" class="btn-remover" aria-label="Remover ${b.title}">Remover</button>
-      </div>
-    `;
-    lista.appendChild(li);
-  }
-
-  // Remover
-  document.querySelectorAll('.btn-remover').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      if (!authHeader) {
-        alert('⚠️ Faça login de administrador antes de remover.');
-        return;
-      }
-      const id = e.currentTarget.getAttribute('data-id');
-      if (!confirm('Remover este livro?')) return;
-
-      const res = await fetch(`${apiBase}/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: authHeader }
-      });
-
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        alert('Erro ao remover: ' + (j.message || res.status));
-        return;
-      }
-      listar(busca.value.trim());
-    });
-  });
-}
-
-// ------------------------------
-// FORMULÁRIO (CRIAR)
-// ------------------------------
-const form = $('#form-livro');
-form?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  if (!authHeader) {
-    alert('⚠️ Faça login de administrador antes de salvar.');
-    return;
-  }
-
-  const body = {
-    title: $('#tituloInput').value.trim(),
-    author: $('#autorInput').value.trim(),
-    fileUrl: $('#pdfUrlInput').value.trim(),   // agora usa fileUrl
-    coverUrl: $('#coverUrlInput').value.trim() // agora usa coverUrl
-  };
-
-  const res = await fetch(apiBase, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authHeader
-    },
-    body: JSON.stringify(body)
-  });
-
-  if (!res.ok) {
-    const j = await res.json().catch(() => ({}));
-    alert('Erro ao salvar: ' + (j.message || j.error || res.status));
-    return;
-  }
-
-  form.reset();
+// --------------------------------------------
+// 🚀 Inicialização
+// --------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("📚 App.js carregado com sucesso!");
+  atualizarInterface();
   listar();
 });
-
-// ------------------------------
-// BUSCA
-// ------------------------------
-btnBuscar?.addEventListener('click', () => listar(busca.value.trim()));
-busca?.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    listar(busca.value.trim());
-  }
-});
-
-// ------------------------------
-// INICIAL
-// ------------------------------
-listar();

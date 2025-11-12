@@ -1,11 +1,9 @@
-/* 🎀 Candy Pastel Theme */
-
 /* Fundo geral */
 body {
   margin: 0;
   font-family: 'Comic Sans MS', cursive, sans-serif;
-  background: linear-gradient(180deg, #fde6ff, #dff6ff);
-  color: #444;
+  background: linear-gradient(180deg, #f8f9ff, #fff6f6, #e9fff4);
+  color: #333;
 }
 
 /* Cabeçalho */
@@ -13,60 +11,36 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #ffb3d9;
+  background: linear-gradient(90deg, #a4d4ff, #ffd1f2, #b9f3d0);
   padding: 15px 25px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 header h1 {
   margin: 0;
   font-size: 26px;
   color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
-/* Botão Cadastrar */
-.btn-cadastro {
-  background: #ff66b2;
-  color: white;
+/* Botões do topo */
+.btn-cadastro,
+.btn-login,
+.btn-sair {
+  background: #ffffff;
+  color: #7d4bff;
   padding: 10px 18px;
   border-radius: 25px;
   font-weight: bold;
   text-decoration: none;
   transition: 0.3s;
-}
-
-.btn-cadastro:hover {
-  background: #ff3385;
-}
-
-/* Título Home */
-main h2 {
-  text-align: center;
-  margin-top: 25px;
-  font-size: 22px;
-  color: #444;
-}
-
-/* Lista de livros */
-.books-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding: 15px;
-  gap: 18px;
-}
-
-/* Capa do livro */
-.book-item img {
-  width: 150px;
-  height: 210px;
-  object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  border: 2px solid #7d4bff;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-.book-item img:hover {
-  transform: scale(1.06);
+.btn-cadastro:hover,
+.btn-login:hover,
+.btn-sair:hover {
+  background: #7d4bff;
+  color: #fff;
 }
