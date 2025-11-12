@@ -12,8 +12,10 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Caminhos dos arquivos locais e secretos
 const CREDENTIALS_PATH = path.join(__dirname, "credentials.json");
-const TOKEN_PATH = path.join(__dirname, "token.json");
+// 👉 Render salva o token em /etc/secrets/token.json
+const TOKEN_PATH = "/etc/secrets/token.json";
 
 // Cria o cliente autenticado
 function getOAuth2Client() {
@@ -80,7 +82,7 @@ export async function uploadFileToDrive({ buffer, fileName, mimeType, folderName
     // Torna o arquivo público
     await makeFilePublic(auth, fileId);
 
-    // Retorna apenas o link correto para exibição direta
+    // Retorna o link direto para exibição
     const directUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
     return { fileId, url: directUrl };
 
