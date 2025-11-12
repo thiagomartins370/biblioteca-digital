@@ -111,8 +111,8 @@
   <script>
     // 🌐 Detecta automaticamente se está rodando local ou online
     const apiBase = location.hostname.includes("localhost")
-      ? "http://localhost:3000"
-      : "https://biblioteca-digital-1-gdjw.onrender.com";
+      ? "http://localhost:3000/api"
+      : "https://biblioteca-digital-1-gdjw.onrender.com/api";
 
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -125,7 +125,7 @@
       status.style.color = "#555";
 
       try {
-        const res = await fetch(`${apiBase}/api/login`, {
+        const res = await fetch(`${apiBase}/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user, pass }),
