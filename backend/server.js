@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// --- Configuração de CORS (corrigida)
+// --- Configuração de CORS
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',')
   : ['*'];
@@ -28,7 +28,6 @@ const allowedOrigins = process.env.CORS_ORIGIN
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Permite chamadas internas (sem origin)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
       console.warn(`❌ Origem não permitida pelo CORS: ${origin}`);
@@ -54,11 +53,11 @@ mongoose
   });
 
 // --- Rotas da API
-app.use('/api/books', booksRouter); // Rotas de livros (listar, upload, excluir)
-app.use('/api', loginRouter); // Rota de login
+app.use('/api/books', booksRouter);
+app.use('/api', loginRouter);
 
-// --- Servir frontend estático
-const frontendDir = path.join(__dirname, '../frontend');
+// --- Servir frontend estático (AGORA NA PASTA CORRETA: /public)
+const frontendDir = path.join(__dirname, 'public');
 app.use(express.static(frontendDir));
 
 // --- Página inicial
