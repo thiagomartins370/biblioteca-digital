@@ -1,46 +1,203 @@
-/* Fundo geral */
+/* ============================ */
+/*  ESTILO INFANTIL PREMIUM     */
+/* ============================ */
+
 body {
   margin: 0;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
-  background: linear-gradient(180deg, #f8f9ff, #fff6f6, #e9fff4);
-  color: #333;
+  font-family: "Fredoka", sans-serif;
+  background: linear-gradient(180deg, #ffeef7, #e7f2ff, #f1ffe7);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Cabeçalho */
-header {
+/* -------------------------- */
+/*  CABEÇALHO LINDO           */
+/* -------------------------- */
+
+.header {
+  background: linear-gradient(90deg, #ffa7dd, #8ab6ff, #6df2d5);
+  padding: 22px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(90deg, #a4d4ff, #ffd1f2, #b9f3d0);
-  padding: 15px 25px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
 }
 
-header h1 {
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  font-size: 42px;
+}
+
+.header h1 {
   margin: 0;
-  font-size: 26px;
-  color: #ffffff;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-}
-
-/* Botões do topo */
-.btn-cadastro,
-.btn-login,
-.btn-sair {
-  background: #ffffff;
-  color: #7d4bff;
-  padding: 10px 18px;
-  border-radius: 25px;
-  font-weight: bold;
-  text-decoration: none;
-  transition: 0.3s;
-  border: 2px solid #7d4bff;
-  cursor: pointer;
-}
-
-.btn-cadastro:hover,
-.btn-login:hover,
-.btn-sair:hover {
-  background: #7d4bff;
   color: #fff;
+  font-size: 34px;
+  font-weight: 600;
+}
+
+/* -------------------------- */
+/*  BOTÕES DO TOPO            */
+/* -------------------------- */
+
+.top-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-top {
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+  backdrop-filter: blur(5px);
+  transition: 0.3s;
+}
+
+.btn-top:hover {
+  transform: scale(1.07);
+}
+
+.add { background: #6a55ff; }
+.entrar { background: #4bb0ff; }
+.sair { background: #ff6b6b; }
+
+/* -------------------------- */
+/*   TÍTULO PRINCIPAL         */
+/* -------------------------- */
+
+.titulo-lista {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 30px;
+  color: #6a55ff;
+}
+
+/* -------------------------- */
+/*   BARRA DE BUSCA           */
+/* -------------------------- */
+
+.search-box {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0 30px 0;
+}
+
+.search-box input {
+  padding: 12px;
+  width: 260px;
+  border-radius: 16px;
+  border: 2px solid #b8ccff;
+  font-size: 16px;
+}
+
+.search-box button {
+  padding: 12px 18px;
+  background: #6a55ff;
+  border: none;
+  border-radius: 16px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.search-box button:hover {
+  background: #4d3bd1;
+}
+
+/* -------------------------- */
+/*   LISTA DE LIVROS          */
+/* -------------------------- */
+
+.lista-livros {
+  max-width: 650px;
+  margin: auto;
+  padding: 10px;
+}
+
+/* CARD INFANTIL PREMIUM */
+.livro-card {
+  background: #ffffffdd;
+  padding: 18px;
+  margin: 14px 0;
+  border-radius: 20px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.12);
+  border-left: 10px solid #6a55ff;
+  animation: fadeIn .5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.livro-card h3 {
+  margin: 0;
+  font-size: 24px;
+  color: #444;
+}
+
+.livro-card p {
+  margin: 6px 0 14px 0;
+  font-size: 15px;
+  color: #666;
+}
+
+/* BOTÕES DENTRO DO CARD */
+
+.card-buttons {
+  display: flex;
+  gap: 14px;
+}
+
+.btn-ler,
+.btn-excluir {
+  padding: 8px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .3s;
+  font-size: 15px;
+}
+
+.btn-ler {
+  background: #6a55ff;
+  color: white;
+}
+
+.btn-ler:hover { background: #4d3bd1; }
+
+.btn-excluir {
+  background: #ff6b6b;
+  color: white;
+}
+
+.btn-excluir:hover { background: #d74343; }
+
+/* -------------------------- */
+/*      RODAPÉ                */
+/* -------------------------- */
+
+.footer {
+  margin-top: auto;
+  padding: 15px;
+  background: #fff4ff;
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+  border-top: 2px solid #ffd0f5;
 }

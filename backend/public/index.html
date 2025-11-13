@@ -2,35 +2,48 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Biblioteca Infantil</title>
+
+  <!-- Fonte infantil moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-  <header>
-    <h1>📘 Biblioteca Infantil</h1>
-    <div class="menu-topo">
-      <a class="btn-cadastro hidden" href="upload.html">+ Cadastrar Livro</a>
-      <a class="btn-login" id="loginBtn" href="login.html">Entrar</a>
-      <button id="logoutBtn" class="btn-sair hidden">Sair</button>
+
+  <!-- Cabeçalho super bonito -->
+  <header class="header">
+    <div class="header-left">
+      <span class="logo">📚</span>
+      <h1>Biblioteca Infantil</h1>
+    </div>
+
+    <div class="top-buttons">
+      <a href="upload.html" class="btn-top add">➕ Cadastrar Livro</a>
+      <a href="login.html" id="loginBtn" class="btn-top entrar">Entrar</a>
+      <button id="logoutBtn" class="btn-top sair">Sair</button>
     </div>
   </header>
 
-  <main>
-    <h2>Explore os Livros Disponíveis</h2>
+  <!-- Conteúdo -->
+  <main class="main">
 
-    <!-- Barra de busca -->
-    <div class="topbar">
-      <input id="busca" type="text" placeholder="Buscar por título ou categoria..." />
+    <h2 class="titulo-lista">🌟 Explore os Livros Disponíveis </h2>
+
+    <div class="search-box">
+      <input id="busca" type="text" placeholder="Busque por título ou categoria..." />
       <button id="btn-buscar">🔍 Buscar</button>
     </div>
 
-    <!-- Lista de livros -->
-    <ul id="lista" class="books-row"></ul>
+    <div id="lista" class="lista-livros"></div>
+
   </main>
 
-  <footer style="text-align:center; padding:15px; font-size:14px; color:#555;">
-   <p>Desenvolvido pelo <strong>Grupo Biblioteca Digital Infantil</strong> – PI II Univesp 2025</p>
+  <!-- Rodapé -->
+  <footer class="footer">
+    Biblioteca Infantil © 2025 – Feito com ❤️ por Grupo PI 2
   </footer>
 
   <script src="app.js"></script>
