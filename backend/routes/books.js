@@ -56,16 +56,27 @@ router.post(
         mimeType: pdfFile.mimetype,
       });
 
-      // 📝 Salva no MongoDB
+      // --------------------------------------------------------
+      // 🔥 CORREÇÃO IMPORTANTE:
+      // Gera links no formato que ABRE em nova aba (uc?export=view&id=)
+      // --------------------------------------------------------
+      const coverId = coverUp.id;
+      const pdfId = pdfUp.id;
+
+      const coverUrl = `https://drive.google.com/uc?export=view&id=${coverId}`;
+      const fileUrl  = `https://drive.google.com/uc?export=view&id=${pdfId}`;
+
+      // 📝 Salva no MongoDB com os links CORRETOS
       const book = await Book.create({
         title,
         category,
-        coverUrl: coverUp.url, // ✅ URL direta da capa (Drive uc?export=view&id=)
-        fileUrl: pdfUp.url,    // ✅ URL direta do PDF (também uc?export=view&id=)
+        coverUrl,
+        fileUrl,
       });
 
       console.log("📚 Livro cadastrado:", title);
       res.json(book);
+
     } catch (error) {
       console.error("❌ Erro ao cadastrar livro:", error);
       res.status(500).json({ error: "Erro ao cadastrar livro" });

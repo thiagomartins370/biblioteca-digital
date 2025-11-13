@@ -82,9 +82,10 @@ export async function uploadFileToDrive({ buffer, fileName, mimeType, folderName
     // Torna o arquivo público
     await makeFilePublic(auth, fileId);
 
-    // Retorna o link direto para exibição
-    const directUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
-    return { fileId, url: directUrl };
+    // Retorna no formato compatível com books.js
+    const url = `https://drive.google.com/uc?export=view&id=${fileId}`;
+
+    return { id: fileId, url };
 
   } catch (error) {
     console.error("❌ Erro no upload para o Google Drive:", error);
