@@ -35,7 +35,7 @@ function getOAuth2Client() {
 // Verifica ou cria a pasta no Drive
 async function getOrCreateFolder(auth, folderName = "BibliotecaDigital") {
   const drive = google.drive({ version: "v3", auth });
-  
+
   const res = await drive.files.list({
     q: `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and trashed=false`,
     fields: "files(id, name)",
@@ -48,9 +48,9 @@ async function getOrCreateFolder(auth, folderName = "BibliotecaDigital") {
   }
 
   const createRes = await drive.files.create({
-    requestBody: { 
-      name: folderName, 
-      mimeType: "application/vnd.google-apps.folder" 
+    requestBody: {
+      name: folderName,
+      mimeType: "application/vnd.google-apps.folder"
     },
     fields: "id",
     supportsAllDrives: true
@@ -69,8 +69,15 @@ async function makeFilePublic(auth, fileId) {
   });
 }
 
-// Upload para o Google Drive
-export async function uploadFileToDrive({ buffer, fileName, mimeType, folderName = "BibliotecaDigital" }) {
+// ============================================
+// 🚀 UPLOAD DEFINITIVO — PREVIEW SEM DOWNLOAD
+// ============================================
+export async function uploadFileToDrive({
+  buffer,
+  fileName,
+  mimeType,
+  folderName = "BibliotecaDigital"
+}) {
   try {
     const auth = getOAuth2Client();
     const drive = google.drive({ version: "v3", auth });
@@ -79,22 +86,25 @@ export async function uploadFileToDrive({ buffer, fileName, mimeType, folderName
     const stream = Readable.from(buffer);
 
     const createRes = await drive.files.create({
-      requestBody: { 
-        name: fileName, 
-        parents: [folderId] 
+      requestBody: {
+        name: fileName,
+        parents: [folderId],
+        mimeType: mimeType  // 🔥 força o Google a reconhecer como PDF
       },
-      media: { mimeType, body: stream },
+      media: {
+        mimeType: mimeType, // 🔥 reforça que o arquivo é PDF
+        body: stream
+      },
       fields: "id, name",
       supportsAllDrives: true
     });
 
     const fileId = createRes.data.id;
 
-    // Torna o arquivo público
     await makeFilePublic(auth, fileId);
 
-    // 🔥 Link definitivo para abrir SEM baixar
-    const directUrl = `https://drive.google.com/uc?export=preview&id=${fileId}`;
+    // 🔥 LINK OFICIAL DO GOOGLE PARA VISUALIZAR PDF
+    const directUrl = `https://drive.google.com/file/d/${fileId}/preview`;
 
     return { fileId, url: directUrl };
 
