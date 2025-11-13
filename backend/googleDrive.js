@@ -40,7 +40,7 @@ async function getOrCreateFolder(auth, folderName = "BibliotecaDigital") {
     q: `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and trashed=false`,
     fields: "files(id, name)",
     pageSize: 1,
-    supportsAllDrives: true
+    supportsAllDrives: true,
   });
 
   if (res.data.files?.length) {
@@ -50,10 +50,10 @@ async function getOrCreateFolder(auth, folderName = "BibliotecaDigital") {
   const createRes = await drive.files.create({
     requestBody: {
       name: folderName,
-      mimeType: "application/vnd.google-apps.folder"
+      mimeType: "application/vnd.google-apps.folder",
     },
     fields: "id",
-    supportsAllDrives: true
+    supportsAllDrives: true,
   });
 
   return createRes.data.id;
@@ -66,50 +66,49 @@ async function makeFilePublic(auth, fileId) {
   await drive.permissions.create({
     fileId,
     requestBody: { role: "reader", type: "anyone" },
-    supportsAllDrives: true
+    supportsAllDrives: true,
   });
 }
 
 // ============================================
-// 🚀 UPLOAD DEFINITIVO — PREVIEW SEM DOWNLOAD
+// 🚀 UPLOAD DEFINITIVO — 100% CORRETO SEM CORROMPER PDF
 // ============================================
 export async function uploadFileToDrive({
   buffer,
   fileName,
   mimeType,
-  folderName = "BibliotecaDigital"
+  folderName = "BibliotecaDigital",
 }) {
   try {
     const auth = getOAuth2Client();
     const drive = google.drive({ version: "v3", auth });
+
     const folderId = await getOrCreateFolder(auth, folderName);
 
+    // Converte buffer -> stream correto
     const stream = Readable.from(buffer);
 
     const createRes = await drive.files.create({
       requestBody: {
         name: fileName,
         parents: [folderId],
-        mimeType: mimeType   // garante PDF
       },
       media: {
-        mimeType: mimeType,
-        body: stream
+        mimeType,
+        body: stream,
       },
-      fields: "id, name",
-      supportsAllDrives: true
+      fields: "id",
+      supportsAllDrives: true,
     });
 
     const fileId = createRes.data.id;
 
-    // Permissão pública
     await makeFilePublic(auth, fileId);
 
-    // LINK OFICIAL DE PREVIEW (não baixa)
-    const directUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+    // 🔥 LINK OFICIAL DO GOOGLE PARA VISUALIZAR SEM BAIXAR
+    const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
 
-    return { fileId, url: directUrl };
-
+    return { fileId, url: previewUrl };
   } catch (error) {
     console.error("❌ Erro no upload para o Google Drive:", error);
     throw error;
