@@ -38,7 +38,13 @@ function renderizarLivros(books) {
         <h3>📘 ${b.title}</h3>
         <p>${b.category || "Sem categoria"}</p>
         <div class="buttons">
-          <a href="${b.fileUrl}" target="_blank" class="btn-ler">📖 Ler</a>
+
+          <!-- 🔥 CORREÇÃO: PDF abre em nova aba SEM baixar -->
+          <a href="${b.fileUrl}&embedded=true"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="btn-ler">📖 Ler</a>
+
           ${
             authHeader && authHeader.startsWith("Basic ")
               ? `<button class="btn-excluir" data-id="${b._id}">🗑️ Excluir</button>`
