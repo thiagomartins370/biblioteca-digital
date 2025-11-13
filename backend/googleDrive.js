@@ -62,6 +62,7 @@ async function getOrCreateFolder(auth, folderName = "BibliotecaDigital") {
 // Torna o arquivo público
 async function makeFilePublic(auth, fileId) {
   const drive = google.drive({ version: "v3", auth });
+
   await drive.permissions.create({
     fileId,
     requestBody: { role: "reader", type: "anyone" },
@@ -89,10 +90,10 @@ export async function uploadFileToDrive({
       requestBody: {
         name: fileName,
         parents: [folderId],
-        mimeType: mimeType  // 🔥 força o Google a reconhecer como PDF
+        mimeType: mimeType   // garante PDF
       },
       media: {
-        mimeType: mimeType, // 🔥 reforça que o arquivo é PDF
+        mimeType: mimeType,
         body: stream
       },
       fields: "id, name",
@@ -101,9 +102,10 @@ export async function uploadFileToDrive({
 
     const fileId = createRes.data.id;
 
+    // Permissão pública
     await makeFilePublic(auth, fileId);
 
-    // 🔥 LINK OFICIAL DO GOOGLE PARA VISUALIZAR PDF
+    // LINK OFICIAL DE PREVIEW (não baixa)
     const directUrl = `https://drive.google.com/file/d/${fileId}/preview`;
 
     return { fileId, url: directUrl };
