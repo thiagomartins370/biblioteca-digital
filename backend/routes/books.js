@@ -42,41 +42,33 @@ router.post(
           .json({ error: "Título, categoria, capa e PDF são obrigatórios." });
       }
 
-      // ⬆️ Envia CAPA
+      // 📌 CORREÇÃO: Forçar tipos corretos para Google Drive
+      // Isso impede o Drive de baixar PDF ao invés de abrir.
+      
+      // ⬆️ Envia CAPA (garante tipo de imagem)
       const coverUp = await uploadFileToDrive({
         buffer: coverFile.buffer,
         fileName: coverFile.originalname,
-        mimeType: coverFile.mimetype,
+        mimeType: coverFile.mimetype || "image/jpeg",
       });
 
-      // ⬆️ Envia PDF
+      // ⬆️ Envia PDF (força application/pdf SEMPRE!)
       const pdfUp = await uploadFileToDrive({
         buffer: pdfFile.buffer,
         fileName: pdfFile.originalname,
-        mimeType: pdfFile.mimetype,
+        mimeType: "application/pdf",
       });
 
-      // --------------------------------------------------------
-      // 🔥 CORREÇÃO IMPORTANTE:
-      // Gera links no formato que ABRE em nova aba (uc?export=view&id=)
-      // --------------------------------------------------------
-      const coverId = coverUp.id;
-      const pdfId = pdfUp.id;
-
-      const coverUrl = `https://drive.google.com/uc?export=view&id=${coverId}`;
-      const fileUrl  = `https://drive.google.com/uc?export=view&id=${pdfId}`;
-
-      // 📝 Salva no MongoDB com os links CORRETOS
+      // 📝 Salva no MongoDB com o formato correto
       const book = await Book.create({
         title,
         category,
-        coverUrl,
-        fileUrl,
+        coverUrl: coverUp.url, // URL direta da capa
+        fileUrl: pdfUp.url,    // URL direta do PDF
       });
 
       console.log("📚 Livro cadastrado:", title);
       res.json(book);
-
     } catch (error) {
       console.error("❌ Erro ao cadastrar livro:", error);
       res.status(500).json({ error: "Erro ao cadastrar livro" });

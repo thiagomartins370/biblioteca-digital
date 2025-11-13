@@ -14,7 +14,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Caminhos dos arquivos locais e secretos
 const CREDENTIALS_PATH = path.join(__dirname, "credentials.json");
-// 👉 Render salva o token em /etc/secrets/token.json
 const TOKEN_PATH = "/etc/secrets/token.json";
 
 // Cria o cliente autenticado
@@ -36,17 +35,25 @@ function getOAuth2Client() {
 // Verifica ou cria a pasta no Drive
 async function getOrCreateFolder(auth, folderName = "BibliotecaDigital") {
   const drive = google.drive({ version: "v3", auth });
+  
   const res = await drive.files.list({
     q: `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and trashed=false`,
     fields: "files(id, name)",
     pageSize: 1,
+    supportsAllDrives: true
   });
 
-  if (res.data.files?.length) return res.data.files[0].id;
+  if (res.data.files?.length) {
+    return res.data.files[0].id;
+  }
 
   const createRes = await drive.files.create({
-    requestBody: { name: folderName, mimeType: "application/vnd.google-apps.folder" },
+    requestBody: { 
+      name: folderName, 
+      mimeType: "application/vnd.google-apps.folder" 
+    },
     fields: "id",
+    supportsAllDrives: true
   });
 
   return createRes.data.id;
@@ -58,6 +65,7 @@ async function makeFilePublic(auth, fileId) {
   await drive.permissions.create({
     fileId,
     requestBody: { role: "reader", type: "anyone" },
+    supportsAllDrives: true
   });
 }
 
@@ -68,13 +76,16 @@ export async function uploadFileToDrive({ buffer, fileName, mimeType, folderName
     const drive = google.drive({ version: "v3", auth });
     const folderId = await getOrCreateFolder(auth, folderName);
 
-    // Converte o Buffer em Stream
     const stream = Readable.from(buffer);
 
     const createRes = await drive.files.create({
-      requestBody: { name: fileName, parents: [folderId] },
+      requestBody: { 
+        name: fileName, 
+        parents: [folderId] 
+      },
       media: { mimeType, body: stream },
       fields: "id, name",
+      supportsAllDrives: true
     });
 
     const fileId = createRes.data.id;
@@ -82,10 +93,10 @@ export async function uploadFileToDrive({ buffer, fileName, mimeType, folderName
     // Torna o arquivo público
     await makeFilePublic(auth, fileId);
 
-    // Retorna no formato compatível com books.js
-    const url = `https://drive.google.com/uc?export=view&id=${fileId}`;
+    // 🔥 Link definitivo para abrir SEM baixar
+    const directUrl = `https://drive.google.com/uc?export=preview&id=${fileId}`;
 
-    return { id: fileId, url };
+    return { fileId, url: directUrl };
 
   } catch (error) {
     console.error("❌ Erro no upload para o Google Drive:", error);
